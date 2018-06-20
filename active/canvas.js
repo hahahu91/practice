@@ -1,54 +1,146 @@
 var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-var colors =["red", "blue", "green", "darkgrey","brown", "grey", "yellow", "pink"];
-ctx.font = '10px Arial';
+const CANVAS_WIDTH = 400;
+const CANVAS_HEIGHT = 400;
+const DX = 100;
+const DY = 100;
+canvas.setAttribute("height", CANVAS_HEIGHT);
+canvas.setAttribute("width", CANVAS_WIDTH);
 
-function draw(index){
-    
-    ctx.fillStyle = colors[2];
-    ctx.fillRect(5+index*45, 35, 30, 40);
+var ctx = canvas.getContext("2d");
+const ITEM_WIDTH = 30;
+const ITEM_HEIGHT = 40;
+
+ctx.font = '10px Arial';
+const ACTIVE_COLOR = "#00FF00";
+const INACTIVE_COLOR = "#FF0000";
+var model = {
+    addItem: function() {
+        this.items.push({
+            id: "item" + this.items.length,
+            dY: 0,
+            active: false,
+        });
+    },
+    items: [],
+}
+
+model.addItem();
+model.addItem();
+model.addItem();
+model.addItem();
+model.addItem();
+
+
+//
+//var arrObjects = []; // объявление массива
+//for (i = 0; i < 6; i++) {
+//    arrObjects[i] = {
+//        id: i,
+//        width: 30,
+//        height: 40,
+//        x: 5+i*45,
+//        y: 35,
+//        active: false,
+//        color: 2
+//    };
+//}
+
+function getItemRect(item, itemIndex) {
+    return {
+        x: DX + itemIndex * (ITEM_HEIGHT + 20),
+        y: DY + item.dY,
+        width: ITEM_WIDTH,
+        height: ITEM_HEIGHT,
+    };
+}
+
+function drawOneElem(ctx, obj, objIndex){
+    ctx.fillStyle = obj.active ? ACTIVE_COLOR : INACTIVE_COLOR;
+    const itemRect = getItemRect(obj, objIndex);
+    ctx.fillRect(itemRect.x, itemRect.y, itemRect.width, itemRect.height);
+    obj.active && console.log(obj.dY);
 }
    
-function drawing() {
-    for (i = 1; i < 6; i++) draw(i);
+function drawing(ctx, model) {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    model.items.forEach((item, index) => {
+        drawOneElem(ctx, item, index)
+    });
 }
-drawing();
+drawing(ctx, model);
 
-canvas.addEventListener("click", function(event){
-    var mousePos = getMousePos(canvas, event);
-    for (index = 1; index < 6; index++) {
-        if ((mousePos.x >= 5+index*45) && (mousePos.x <= 35+index*45) && (mousePos.y >= 35) && (mousePos.y <= 75) ) changeElem(5+index*45, 35, index);//console.log('!');
-    }
-    //&& (mousePos.x <= 40+index*45) && (mousePos.у >= 35) && (mousePos.у <= 75)
-    //console.log(mousePos.x, mousePos.y);
-}, false);
-function changeElem(x,y, index) {
-    console.log(x,y,index);
-    ctx.clearRect(x,y, 30, 40);
-    ctx.fillStyle = colors[3];
-    ctx.fillRect(5+index*45, 35-20, 30, 40);
+function initHandlers(canvasEl, model) {
+    canvasEl.addEventListener("click", (event) => {
+        const arrObjects = model.items;
+        let mousePos = getMousePos(canvasEl, event);
+        model.items.forEach((item, index) => {
+            const rect = getItemRect(item, index);
+            if (mousePos.x >= rect.x && mousePos.x <= rect.x+rect.width && 
+               mousePos.y >= rect.y && mousePos.y <= rect.y+rect.height)
+                {
+                    processElementClick(model.items, item);
+                }
+        });
+    }, false);
 }
+initHandlers(canvas, model);
+
+function processElementClick(items, clickedItem) {
+    items.forEach((item) => {
+        if (item == clickedItem) {
+            activate(item, !item.active);
+        }
+        else if (item.active) {
+            activate(item, false);
+        }
+    });
+}
+function activate(item, isActive){
+    item.active = isActive;
+    const ANIMATE_DY = 20;
+    animate({
+        duration: 400,
+        timing: timeFraction => timeFraction,
+        draw: (progress) => {
+            item.dY = isActive 
+                ? 0 + progress * ANIMATE_DY
+                : ANIMATE_DY - progress * ANIMATE_DY;
+        }
+    });
+}
+
+function animate(options) {
+
+  let start = performance.now();
+    
+  requestAnimationFrame(function animate(time) {
+    // timeFraction от 0 до 1
+    let timeFraction = (time - start) / options.duration;
+    if (timeFraction > 1) timeFraction = 1;
+
+    // текущее состояние анимации
+    let progress = options.timing(timeFraction)
+    
+    options.draw(progress);
+    drawing(ctx, model);
+    if (timeFraction < 1) {
+      requestAnimationFrame(animate);
+    }
+  });
+}
+animate();
+
 
 function getMousePos(canvas, even) {
-    var rect = canvas.getBoundingClientRect();
+    let rect = canvas.getBoundingClientRect();
     return {
         x: even.clientX - rect.left,
         y: even.clientY - rect.top
     };
 }
       
-/*function hittest(event) {
-  // Получить размеры и координаты холста 
-var bb = canvas.getBoundingClientRect();
-  // Преобразовать координаты указателя мыши в координаты холста
-  var х = (event.clientX-bb.left)*(canvas.width/bb.width);
-  var у = (event.clientY-bb.top)*(canvas.height/bb.height);
-  // Залить контур, если пользователь щелкнул в его пределах
-    ctx.fillStyle[3];
-  if (сtx.isPointInPath(x,у)) сtx.fill();
-} */
-//void lineTo(double x, double y)
 /*
+
 function addElement(value){
     data.push(value);
     total += value;
@@ -138,14 +230,16 @@ function arctg360(xs, ys) {
     else {temp = 360 + Math.atan(ys/xs)* 180 / Math.PI};
     return temp;
 } 
-*/
 
-function mousecoordinates(x, y){
+function mouseCoordinates(x, y){
     var tempX = event.pageX - canvas.offsetLeft;
     var tempY = event.pageY - canvas.offsetTop;
-    var x = tempX - canvas.weight/2;
-    var y = tempY - canvas.height/2;
+   return{
+       x: tempX - canvas.weight/2,
+       y: tempY - canvas.height/2
+   }
 }
+*/
 
 function inRad(degrees){
     return degrees*Math.PI/180;
