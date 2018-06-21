@@ -1,14 +1,16 @@
 var canvas = document.getElementById("canvas");
-const CANVAS_WIDTH = 400;
-const CANVAS_HEIGHT = 400;
+const CANVAS_WIDTH = 4000;
+const CANVAS_HEIGHT = 4000;
 const DX = 100;
 const DY = 100;
+const ANIMATE_DY = 200;
+const ANIMATION_DURATION = 1000;
 canvas.setAttribute("height", CANVAS_HEIGHT);
 canvas.setAttribute("width", CANVAS_WIDTH);
 
 var ctx = canvas.getContext("2d");
-const ITEM_WIDTH = 30;
-const ITEM_HEIGHT = 40;
+const ITEM_WIDTH = 200;
+const ITEM_HEIGHT = 200;
 
 ctx.font = '10px Arial';
 const ACTIVE_COLOR = "#00FF00";
@@ -51,6 +53,7 @@ function getItemRect(item, itemIndex) {
         y: DY + item.dY,
         width: ITEM_WIDTH,
         height: ITEM_HEIGHT,
+        baseProgress: 0,
     };
 }
 
@@ -58,7 +61,7 @@ function drawOneElem(ctx, obj, objIndex){
     ctx.fillStyle = obj.active ? ACTIVE_COLOR : INACTIVE_COLOR;
     const itemRect = getItemRect(obj, objIndex);
     ctx.fillRect(itemRect.x, itemRect.y, itemRect.width, itemRect.height);
-    obj.active && console.log(obj.dY);
+    //obj.active && console.log(obj.dY);
 }
    
 function drawing(ctx, model) {
@@ -84,7 +87,6 @@ function initHandlers(canvasEl, model) {
     }, false);
 }
 initHandlers(canvas, model);
-
 function processElementClick(items, clickedItem) {
     items.forEach((item) => {
         if (item == clickedItem) {
@@ -95,21 +97,65 @@ function processElementClick(items, clickedItem) {
         }
     });
 }
+
 function activate(item, isActive){
+    item.baseProgress = item.active ? (1 - item.dY / ANIMATE_DY) : (item.dY / ANIMATE_DY);
     item.active = isActive;
+    item.duration = ANIMATION_DURATION * (1 - item.baseProgress);
+    item.activeTime = performance.now();
+//    console.log("direction", isActive ? "down" : "up");
+//    console.log("dY", item.dY);
+//    console.log("baseProgress", baseProgress);
+//    console.log("duration", 400 * (1 - baseProgress));
+}
+
+function animate() {
+    let start = performance.now();
+    
+    model.items.forEach((item, index) => {
+        if (item.duration > 0) {
+            let timeFraction = (start - item.activeTime ) / ANIMATION_DURATION;
+            if (timeFraction > 1) timeFraction = 1;
+            timeFraction => timeFraction;
+            let progresstemp = timeFraction;
+            console.log(progresstemp);
+            //item.duration -= 
+            item.duration = ANIMATION_DURATION-timeFraction*ANIMATION_DURATION;
+            //console.log(timeFraction, item.duration);
+            const progress = (ANIMATION_DURATION-item.duration)/ANIMATION_DURATION * (1 - item.baseProgress) + item.baseProgress;
+            item.dY = item.active 
+                ? 0 + progress * ANIMATE_DY
+                : ANIMATE_DY - progress * ANIMATE_DY;
+            drawing(ctx, model);
+            let time = performance.now();
+        }
+        else item.duration = 0;
+    });
+    requestAnimationFrame(animate);
+}
+animate();
+
+/*
+function activate_temp(item, isActive){
     const ANIMATE_DY = 20;
+    const baseProgress = item.active ? (1 - item.dY / ANIMATE_DY) : (item.dY / ANIMATE_DY);
+    item.active = isActive;
+    console.log("direction", isActive ? "down" : "up");
+    console.log("dY", item.dY);
+    console.log("baseProgress", baseProgress);
+    console.log("duration", 400 * (1 - baseProgress));
     animate({
-        duration: 400,
+        duration: 400 * (1 - baseProgress),
         timing: timeFraction => timeFraction,
         draw: (progress) => {
+            progress = progress * (1 - baseProgress) + baseProgress;
             item.dY = isActive 
                 ? 0 + progress * ANIMATE_DY
                 : ANIMATE_DY - progress * ANIMATE_DY;
-        }
+            }
     });
 }
-
-function animate(options) {
+function animate_temp(options) {
 
   let start = performance.now();
     
@@ -128,8 +174,7 @@ function animate(options) {
     }
   });
 }
-animate();
-
+*/
 
 function getMousePos(canvas, even) {
     let rect = canvas.getBoundingClientRect();
@@ -138,7 +183,10 @@ function getMousePos(canvas, even) {
         y: even.clientY - rect.top
     };
 }
-      
+
+function inRad(degrees){
+    return degrees*Math.PI/180;
+}
 /*
 
 function addElement(value){
@@ -240,7 +288,3 @@ function mouseCoordinates(x, y){
    }
 }
 */
-
-function inRad(degrees){
-    return degrees*Math.PI/180;
-}
