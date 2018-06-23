@@ -4,7 +4,7 @@ const CANVAS_HEIGHT = 4000;
 const DX = 100;
 const DY = 100;
 const ANIMATE_DY = 200;
-const ANIMATION_DURATION = 1000;
+const ANIMATION_DURATION = 4000;
 canvas.setAttribute("height", CANVAS_HEIGHT);
 canvas.setAttribute("width", CANVAS_WIDTH);
 
@@ -32,21 +32,6 @@ model.addItem();
 model.addItem();
 model.addItem();
 
-
-//
-//var arrObjects = []; // объявление массива
-//for (i = 0; i < 6; i++) {
-//    arrObjects[i] = {
-//        id: i,
-//        width: 30,
-//        height: 40,
-//        x: 5+i*45,
-//        y: 35,
-//        active: false,
-//        color: 2
-//    };
-//}
-
 function getItemRect(item, itemIndex) {
     return {
         x: DX + itemIndex * (ITEM_HEIGHT + 20),
@@ -61,7 +46,6 @@ function drawOneElem(ctx, obj, objIndex){
     ctx.fillStyle = obj.active ? ACTIVE_COLOR : INACTIVE_COLOR;
     const itemRect = getItemRect(obj, objIndex);
     ctx.fillRect(itemRect.x, itemRect.y, itemRect.width, itemRect.height);
-    //obj.active && console.log(obj.dY);
 }
    
 function drawing(ctx, model) {
@@ -102,27 +86,22 @@ function activate(item, isActive){
     item.baseProgress = item.active ? (1 - item.dY / ANIMATE_DY) : (item.dY / ANIMATE_DY);
     item.active = isActive;
     item.duration = ANIMATION_DURATION * (1 - item.baseProgress);
+    console.log('baseProg', item.baseProgress);
+    console.log('duration', item.duration);
+//    console.log('dY', item.dY);
+    
     item.activeTime = performance.now();
-//    console.log("direction", isActive ? "down" : "up");
-//    console.log("dY", item.dY);
-//    console.log("baseProgress", baseProgress);
-//    console.log("duration", 400 * (1 - baseProgress));
 }
 
 function animate() {
     let start = performance.now();
-    
     model.items.forEach((item, index) => {
         if (item.duration > 0) {
             let timeFraction = (start - item.activeTime ) / ANIMATION_DURATION;
             if (timeFraction > 1) timeFraction = 1;
-            timeFraction => timeFraction;
-            let progresstemp = timeFraction;
-            console.log(progresstemp);
-            //item.duration -= 
-            item.duration = ANIMATION_DURATION-timeFraction*ANIMATION_DURATION;
-            //console.log(timeFraction, item.duration);
-            const progress = (ANIMATION_DURATION-item.duration)/ANIMATION_DURATION * (1 - item.baseProgress) + item.baseProgress;
+            item.duration = ANIMATION_DURATION * (1 - item.baseProgress)-timeFraction*ANIMATION_DURATION;
+            const progress = timeFraction*ANIMATION_DURATION/ANIMATION_DURATION + item.baseProgress;
+            const prog = (ANIMATION_DURATION-item.duration)/(ANIMATION_DURATION * (1-item.baseProgress));
             item.dY = item.active 
                 ? 0 + progress * ANIMATE_DY
                 : ANIMATE_DY - progress * ANIMATE_DY;
@@ -134,6 +113,19 @@ function animate() {
     requestAnimationFrame(animate);
 }
 animate();
+
+
+function getMousePos(canvas, even) {
+    let rect = canvas.getBoundingClientRect();
+    return {
+        x: even.clientX - rect.left,
+        y: even.clientY - rect.top
+    };
+}
+
+function inRad(degrees){
+    return degrees*Math.PI/180;
+}
 
 /*
 function activate_temp(item, isActive){
@@ -174,21 +166,6 @@ function animate_temp(options) {
     }
   });
 }
-*/
-
-function getMousePos(canvas, even) {
-    let rect = canvas.getBoundingClientRect();
-    return {
-        x: even.clientX - rect.left,
-        y: even.clientY - rect.top
-    };
-}
-
-function inRad(degrees){
-    return degrees*Math.PI/180;
-}
-/*
-
 function addElement(value){
     data.push(value);
     total += value;
