@@ -58,7 +58,7 @@ drawing(ctx, model);
 
 function initHandlers(canvasEl, model) {
     canvasEl.addEventListener("click", (event) => {
-        const arrObjects = model.items;
+       // const arrObjects = model.items;
         let mousePos = getMousePos(canvasEl, event);
         model.items.forEach((item, index) => {
             const rect = getItemRect(item, index);
@@ -71,6 +71,7 @@ function initHandlers(canvasEl, model) {
     }, false);
 }
 initHandlers(canvas, model);
+
 function processElementClick(items, clickedItem) {
     items.forEach((item) => {
         if (item == clickedItem) {
@@ -89,7 +90,6 @@ function activate(item, isActive){
     console.log('baseProg', item.baseProgress);
     console.log('duration', item.duration);
 //    console.log('dY', item.dY);
-    
     item.activeTime = performance.now();
 }
 
