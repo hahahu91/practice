@@ -86,14 +86,14 @@ function writeProcents(text, x, y){
 }
 
 canvas.addEventListener("mousedown", startRecalculation, false);
-canvas.addEventListener("click", activateElement, false);
+//canvas.addEventListener("click", activateElement, false);
 document.addEventListener("mouseup", stopRecalculation, false);
 document.addEventListener("mousemove", recalculation, false);
 
 function startRecalculation(event) {
     model.isRecalculation = true;
     let mousePos = mousecoordinates(canvas, event);
-    model.degCur = inDeg(model.curent);
+    //model.degCur = inDeg(model.curent);
     model.curent = inRad(mousePos.deg);
     model.oldStart = model.start%(Math.PI*2);
     //let requestId = window.requestAnimationFrame(animate);
@@ -144,8 +144,9 @@ function activateEl(modelEl, deg, hypotenuse, mousePos){
 function recalculation(event) {
     if (model.isRecalculation == true) {
         let mousePos = mousecoordinates(canvas, event);
-        model.degCur = inDeg(model.curent);
-        let cur = mousePos.deg - model.degCur;
+        //model.degCur = inDeg(model.curent);
+//        let cur = mousePos.deg - model.degCur;
+         let cur = mousePos.deg - inDeg(model.curent);
         if (cur < 0) {cur += 360};
         model.start = model.oldStart + inRad(cur);
     }
@@ -169,13 +170,14 @@ function animate() {
         }
         else item.duration = 0;
     });
-    if (model.prevCur != model.degCur) printChart(ctx, model);
+    if (model.start != model.oldStart) printChart(ctx, model);
     requestAnimationFrame(animate);
 }
 animate();
 
-function stopRecalculation() {
+function stopRecalculation(even) {
     model.isRecalculation = false;
+    if (model.start == model.oldStart) activateElement(even);
     model.prevCur = model.degCur;
 }
 
