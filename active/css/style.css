@@ -1,0 +1,22 @@
+.main_container {
+  width: 960px;
+  position: relative;
+  margin: 0 auto; }
+
+#canvas {
+  float: left; }
+
+.right_menu {
+  background: grey;
+  display: none;
+  width: 200px;
+  height: 100%;
+  right: 0; }
+  .right_menu .title {
+    text-align: center; }
+
+.active {
+  display: block;
+  position: fixed; }
+
+/*# sourceMappingURL=style.css.map */
