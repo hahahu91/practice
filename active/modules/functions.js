@@ -1,11 +1,11 @@
-import {CANVAS_WIDTH, CANVAS_HEIGHT, ANIMATION_DURATION, ANIMATE_DY}  from '/modules/constants.js';
+import {CANVAS_WIDTH, CANVAS_HEIGHT, ANIMATION_DURATION, ANIMATE_DY, RADIUS_CHART}  from '/modules/constants.js';
 
 function getItemRect(item, start, total) {
     let radiant = (Math.PI * 2) * (item.value / total);
     return {
         rad: radiant,
-        cx: CANVAS_WIDTH / 2 + (CANVAS_HEIGHT / 2.8 + item._animation.currentAnimation) * Math.cos((start + start + radiant)/2),
-        cy: CANVAS_WIDTH / 2 + (CANVAS_HEIGHT / 2.8 + item._animation.currentAnimation) * Math.sin((start + start + radiant)/2),
+        cx: CANVAS_WIDTH / 2 + (RADIUS_CHART + 20 + item._animation.currentAnimation) * Math.cos((start + start + radiant)/2),
+        cy: CANVAS_WIDTH / 2 + (RADIUS_CHART + 20 + item._animation.currentAnimation) * Math.sin((start + start + radiant)/2),
         x: CANVAS_WIDTH / 2 + item._animation.currentAnimation * Math.cos((start + start + radiant) / 2),
         y: CANVAS_WIDTH / 2 + item._animation.currentAnimation * Math.sin((start + start + radiant) / 2),
     };
@@ -28,7 +28,7 @@ function arctg360(xs, ys) {
 function mousecoordinates(canvas, event){
     let margin = canvas.getBoundingClientRect();
     let tempX = event.pageX - canvas.offsetLeft - margin.left;
-    let tempY = event.pageY - canvas.offsetTop - - margin.top;
+    let tempY = event.pageY - canvas.offsetTop;
     let x = tempX - CANVAS_WIDTH / 2;
     let y = tempY - CANVAS_HEIGHT / 2;
     return {
@@ -51,6 +51,8 @@ function showDescription(item){
     let title = document.getElementsByTagName('h3')[0];
     let paragraph = document.getElementsByClassName('about_item')[0];
     decrDiv.classList.add('active');
+    let color = item.getColor();
+    decrDiv.style.borderTopColor = color;
     title.innerHTML = item.id;
     paragraph.innerHTML = item.value;
 }

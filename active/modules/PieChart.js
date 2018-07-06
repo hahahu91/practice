@@ -1,4 +1,4 @@
-import {CANVAS_WIDTH, CANVAS_HEIGHT, ANIMATION_DURATION, ANIMATE_DY}  from '/modules/constants.js';
+import {CANVAS_WIDTH, CANVAS_HEIGHT, ANIMATION_DURATION, ANIMATE_DY, RADIUS_CHART}  from '/modules/constants.js';
 import {Item} from '/modules/Item.js';
 import {arctg360, mousecoordinates, inRad, inDeg, getItemRect, showDescription, closeDescription} from '/modules/functions.js';
 
@@ -69,7 +69,7 @@ export class PieChart {
     
     activateElement(event, mousePos) {
         let hypo = Math.sqrt(mousePos.x  * mousePos.x + mousePos.y * mousePos.y);
-        if (hypo <= (CANVAS_HEIGHT / 3 + CANVAS_HEIGHT / 9)){
+        if (hypo <= (RADIUS_CHART + ANIMATE_DY)){
             this.activateEl(inRad(mousePos.deg), hypo, mousePos);
         }
     }
@@ -103,3 +103,4 @@ function processElementClick(items, clickedItem) {
         }
     });
 }
+
