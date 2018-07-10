@@ -5,7 +5,8 @@
   width: 720px;
   height: 540px;
   position: relative;
-  margin: 0 auto; }
+  margin: 0 auto;
+  min-width: 700px; }
 
 .header {
   width: 100%;
@@ -16,7 +17,7 @@
 
 .canvas {
   max-width: 50%;
-  width: 340px;
+  width: 47.2222222222%;
   float: left; }
   .canvas #canvas {
     position: absolute;
@@ -26,7 +27,7 @@
 
 .right_menu {
   float: right;
-  margin: 100px 0;
+  margin: 100px 7px 100px 0;
   border-top-left-radius: 10px;
   border-top-style: solid;
   border-top-width: 7px;
@@ -38,12 +39,44 @@
   width: 0;
   height: 200px;
   box-shadow: 0.4em 0.4em 5px rgba(122, 122, 122, 0.5);
-  transition: all 1s ease-out 0.5s; }
-  .right_menu .title {
-    text-align: center; }
+  transition: all 1s ease-out 0s; }
+
+.title {
+  text-align: center; }
 
 .active {
   opacity: 1;
-  width: 340px; }
+  width: 47.2222222222%; }
+
+.hidden {
+  color: rgba(0, 0, 0, 0); }
+
+.buttons {
+  position: relative;
+  margin-left: 50%;
+  margin-top: 450px; }
+
+.button {
+  float: left;
+  width: 45%;
+  height: 40px;
+  text-decoration: none;
+  text-align: center;
+  line-height: 40px;
+  background-color: green;
+  color: darkturquoise;
+  border-radius: 5px;
+  cursor: pointer; }
+
+.button:hover {
+  background-color: darkgreen; }
+
+.button:disabled {
+  background-color: grey;
+  cursor: default; }
+
+.next {
+  float: right;
+  margin-right: 5px; }
 
 /*# sourceMappingURL=style.css.map */

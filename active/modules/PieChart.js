@@ -1,6 +1,6 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT, ANIMATION_DURATION, ANIMATE_DY, RADIUS_CHART}  from '/modules/constants.js';
 import {Item} from '/modules/Item.js';
-import {arctg360, mousecoordinates, inRad, inDeg, getItemRect, showDescription, closeDescription} from '/modules/functions.js';
+import {arctg360, inRad, inDeg, getItemRect, showDescription, closeDescription} from '/modules/functions.js';
 
 export class PieChart {
     constructor() {
@@ -9,16 +9,18 @@ export class PieChart {
         this._rotationDegree = 0;
         this.total = 0;
         this.isRecalculation = false;
-        this._currentState = (Math.PI * 3) / 2;
+        this._currentState = 1.5 * Math.PI;
         this._curRotation = 0;
     }
 
     addItem(value) {
-        this._items.push(new Item(value, this._colors[this._items.length % this._colors.length], this._items.length));
+        this._items.push(new Item(
+            value, this._colors[this._items.length % this._colors.length], this._items.length
+        ));
         this.total += value;
     }
     
-    rotateAt(degree) {
+    setRotation(degree) {
         this._rotationDegree = degree;
     }
     
@@ -50,13 +52,12 @@ export class PieChart {
             item.draw(canvasContext, this._currentState + this._rotationDegree, this.total);
             item.start = this._currentState;
             this._currentState += itemRect.rad;
-            this._currentState = this._currentState % (Math.PI * 2);
+            this._currentState = this._currentState % (2 * Math.PI);
             item.finish = this._currentState;
         });
     }
     
     animate(canvasContext){
-        let start = performance.now();
         this._items.forEach((item) => {
             let curAnimation = item.animation();
             if (curAnimation.isAnimation) {
@@ -64,43 +65,81 @@ export class PieChart {
                 this.draw(canvasContext);
             }
         });
-        if (this.rotateAt) this.draw(canvasContext);
+        this.setRotation && this.draw(canvasContext);
     }
     
-    activateElement(event, mousePos) {
-        let hypo = Math.sqrt(mousePos.x  * mousePos.x + mousePos.y * mousePos.y);
-        if (hypo <= (RADIUS_CHART + ANIMATE_DY)){
-            this.activateEl(inRad(mousePos.deg), hypo, mousePos);
+    activateElement(event, mousePos) { // TODO: Math.hypo
+        const distance = Math.hypot(mousePos.x, mousePos.y);
+        if (distance <= (RADIUS_CHART + ANIMATE_DY)) {
+            this.activateEl(distance, mousePos);
         }
     }
     
-    activateEl(deg, hypotenuse, mousePos){
+    activateEl(distance, mousePos){
         this._items.forEach((item) => {
-            let click = item.check(deg, hypotenuse, this.total, mousePos);
-            if (click) {
-                processElementClick(this._items, item);
-            }
+            const click = item.check(distance, this.total, mousePos);
+            click && processElementClick(this._items, item);
         });
+    }
+    
+    nextElem(){
+        let isActiveIndex = 0;
+        this._items.forEach((item, index) => {
+            if (item.isActive()) isActiveIndex = index + 1;
+        });
+        processElementClick(this._items, this._items[isActiveIndex]);
+    }
+    
+    prevElem(){
+        let isActiveIndex = this._items.length - 1;
+        this._items.forEach((item, index) => {
+            if (item.isActive()) isActiveIndex = index - 1;
+        });
+        processElementClick(this._items, this._items[isActiveIndex]);
     }
 }
 
 function processElementClick(items, clickedItem) {
-    items.forEach((item) => {
-        let isActive = item.isActive();
+    items.forEach((item, index) => {
+        let curAnimation = item.animation();
+            
+        const isActive = item.isActive();
         if (item == clickedItem) {
             if (isActive) {
+                if (curAnimation.isAnimation) return;
                 item.deactivate();
                 closeDescription();
+                disableButtons(1, items.length - 1);
             }
             else  {
+                if (curAnimation.isAnimation) return;
                 item.activate();
                 showDescription(item);
+                disableButtons(index, items.length - 1);
             }
         }
-        else {
-            if (isActive) 
-                item.deactivate();
+        else if (isActive) {
+            item.deactivate();
         }
     });
+     
 }
 
+function disableButtons(isActiveIndex, maxIndex){
+    let prev = document.getElementsByClassName('prev')[0];
+    let next = document.getElementsByClassName('next')[0];
+    
+    if (isActiveIndex == 0) {
+        prev.setAttribute('disabled', 'disabled');
+        next.hasAttribute('disabled') && next.removeAttribute('disabled');
+    }
+    else if (isActiveIndex == maxIndex) {
+        next.setAttribute('disabled', 'disabled');
+        prev.hasAttribute('disabled') && prev.removeAttribute('disabled');
+    }
+    else {
+        next.hasAttribute('disabled') && next.removeAttribute('disabled');
+        prev.hasAttribute('disabled') && prev.removeAttribute('disabled');
+    }
+
+}

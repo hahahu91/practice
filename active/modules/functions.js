@@ -1,40 +1,41 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT, ANIMATION_DURATION, ANIMATE_DY, RADIUS_CHART}  from '/modules/constants.js';
 
 function getItemRect(item, start, total) {
-    let radiant = (Math.PI * 2) * (item.value / total);
-    return {
-        rad: radiant,
-        cx: CANVAS_WIDTH / 2 + (RADIUS_CHART + 20 + item._animation.currentAnimation) * Math.cos((start + start + radiant)/2),
-        cy: CANVAS_WIDTH / 2 + (RADIUS_CHART + 20 + item._animation.currentAnimation) * Math.sin((start + start + radiant)/2),
-        x: CANVAS_WIDTH / 2 + item._animation.currentAnimation * Math.cos((start + start + radiant) / 2),
-        y: CANVAS_WIDTH / 2 + item._animation.currentAnimation * Math.sin((start + start + radiant) / 2),
+    const radians = (Math.PI * 2) * (item.value / total); // TODO: translate radiant
+    const center = CANVAS_WIDTH / 2;
+    const middle = (start + start + radians) / 2;
+    const curAnimation = item._animation.currentAnimation;
+    const distanceText = RADIUS_CHART + 10 + curAnimation;
+    
+    return { // TODO: remove duplicated code
+        rad: radians,
+        cx: center + (distanceText) * Math.cos(middle),
+        cy: center + (distanceText) * Math.sin(middle),
+        x: center + curAnimation * Math.cos(middle),
+        y: center + curAnimation * Math.sin(middle),
     };
 }
 
-function arctg360(xs, ys) {
-    var temp;
-    if (ys >= 0 && xs >= 0) {
-        temp = Math.atan(ys/xs) * 180 / Math.PI
+function arctg360(x, y) { // TODO: what means `s`? no-s
+    // TODO: switch, no-var
+    if (y >= 0 && x >= 0) {
+        return Math.atan(y / x) * 180 / Math.PI;
     }
-    else if (ys >= 0 && xs < 0 || ys < 0 && xs < 0) {
-        temp = 180 + Math.atan(ys/xs) * 180 / Math.PI
+    else if (y >= 0 &&  x < 0 || y < 0 && x < 0) {
+        return 180 + Math.atan(y / x) * 180 / Math.PI;
     }
     else {
-        temp = 360 + Math.atan(ys/xs) * 180 / Math.PI
+        return 360 + Math.atan(y / x) * 180 / Math.PI;
     };
-    return temp;
 } 
 
-function mousecoordinates(canvas, event){
+function mouseCoordinates(canvas, event){
     let margin = canvas.getBoundingClientRect();
     let tempX = event.pageX - canvas.offsetLeft - margin.left;
     let tempY = event.pageY - canvas.offsetTop;
-    let x = tempX - CANVAS_WIDTH / 2;
-    let y = tempY - CANVAS_HEIGHT / 2;
     return {
-        deg: arctg360(x, y),
-        x: x,
-        y: y,
+        x: tempX - CANVAS_WIDTH / 2,
+        y: tempY - CANVAS_HEIGHT / 2,
     }
 }
 
@@ -48,26 +49,39 @@ function inDeg(radians){
 
 function showDescription(item){
     let decrDiv = document.getElementById('decription'); 
-    let title = document.getElementsByTagName('h3')[0];
+    let title = document.getElementsByClassName('title')[0];
     let paragraph = document.getElementsByClassName('about_item')[0];
-    decrDiv.classList.add('active');
     let color = item.getColor();
-    decrDiv.style.borderTopColor = color;
-    title.innerHTML = item.id;
-    paragraph.innerHTML = item.value;
+    
+    if (decrDiv.classList.contains('active')) {
+        decrDiv.classList.add('hidden');
+        setTimeout(function(){
+            decrDiv.classList.remove('hidden');
+            decrDiv.style.borderTopColor = color;
+            title.innerHTML = item.id;
+            paragraph.innerHTML = item.value;
+        },1000)
+    }
+    else {
+        decrDiv.classList.add('active');
+        decrDiv.style.borderTopColor = color;
+        title.innerHTML = item.id;
+        paragraph.innerHTML = item.value;
+    }
 }
 
 function closeDescription() {
-    let decrDiv = document.getElementById('decription'); 
+    let decrDiv = document.getElementById('decription');
     decrDiv.classList.remove('active');
 }
 
+
 export {
     arctg360,
-    mousecoordinates,
+    mouseCoordinates,
     inRad,
     inDeg,
     getItemRect,
     showDescription,
-    closeDescription
+    closeDescription,
 };
