@@ -106,13 +106,11 @@ function processElementClick(items, clickedItem) {
         const isActive = item.isActive();
         if (item == clickedItem) {
             if (isActive) {
-                if (curAnimation.isAnimation) return;
                 item.deactivate();
                 closeDescription();
                 disableButtons(1, items.length - 1);
             }
             else  {
-                if (curAnimation.isAnimation) return;
                 item.activate();
                 showDescription(item);
                 disableButtons(index, items.length - 1);

@@ -61,10 +61,14 @@ export class Item {
     check(distance, totalValue, mousePos) {
         const angle = inRad(arctg360(mousePos.x, mousePos.y));
         if ((angle >= this.start && angle < this.finish) || ((this.start > this.finish) && (angle >= this.start || angle < this.finish) )) {
-            if (this._isActive) {
-                return activElementCheck(this, totalValue, mousePos);
+            let curAnimate = this.animation();
+            if (!curAnimate.isAnimation) {
+                if (this._isActive) {
+                    return activElementCheck(this, totalValue, mousePos);
+                }
+                else return (distance <= RADIUS_CHART);
             }
-            else return (distance <= RADIUS_CHART)
+            else return false;
         }
         return false;
     }

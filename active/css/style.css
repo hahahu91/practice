@@ -19,11 +19,12 @@
   max-width: 50%;
   width: 47.2222222222%;
   float: left; }
-  .canvas #canvas {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    margin: auto 0; }
+
+#canvas {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0; }
 
 .right_menu {
   float: right;
@@ -39,7 +40,8 @@
   width: 0;
   height: 200px;
   box-shadow: 0.4em 0.4em 5px rgba(122, 122, 122, 0.5);
-  transition: all 1s ease-out 0s; }
+  transition: all 1s ease-out 0s;
+  overflow: hidden; }
 
 .title {
   text-align: center; }

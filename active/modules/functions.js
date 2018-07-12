@@ -60,7 +60,7 @@ function showDescription(item){
             decrDiv.style.borderTopColor = color;
             title.innerHTML = item.id;
             paragraph.innerHTML = item.value;
-        },1000)
+        }, 700)
     }
     else {
         decrDiv.classList.add('active');

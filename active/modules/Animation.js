@@ -32,7 +32,6 @@ export class Animation {
         const start = performance.now();
         if (this._duration > 0) {
             let timeFraction = (start - this._activationTimestamp ) / ANIMATION_DURATION;
-            
             this._duration = ANIMATION_DURATION * ((1 - this._baseProgress) - timeFraction); 
             const progress = timeFraction + this._baseProgress; 
             const prog = (ANIMATION_DURATION - this._duration) / (ANIMATION_DURATION * (1 -this._baseProgress));

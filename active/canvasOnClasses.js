@@ -21,6 +21,7 @@ buttonClick();
 
 canvas.addEventListener('mousedown', startRecalculation, false);
 document.addEventListener('mouseup', stopRecalculation, false);
+document.addEventListener('dragend', stopRecalculation, false);
 document.addEventListener('mousemove', recalculation, false);
 
 function buttonClick() {
